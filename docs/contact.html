@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | Six Sense Solutions</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0a0a0a; --panel:#111418; --text:#e7edf5; --muted:#9aa8b9; --accent:#2ca6ff; --border:#25303d; --ok:#2fd17b; --err:#ff6b6b; --font:"Fira Code", ui-monospace, monospace; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.6; }
+    .container { width:min(1120px, 92vw); margin:0 auto; }
+    .nav-wrap { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); background: rgba(10,10,10,.92); border-bottom: 1px solid var(--border); }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { color: #ecf3fb; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .btn { border:1px solid var(--accent); color:#eaf6ff; background:#12324a; border-radius:8px; padding:10px 14px; cursor:pointer; font-family:var(--font); }
+    .hero { padding:52px 0 26px; }
+    h1,h2,h3 { margin:0 0 10px; line-height:1.3; }
+    p { margin:0 0 12px; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:1.2fr 1fr; gap:16px; }
+    .card { border:1px solid var(--border); background:var(--panel); border-radius:10px; padding:16px; }
+    label { display:block; margin:8px 0 6px; color:#d9e7f5; }
+    input, select, textarea { width:100%; background:#0d1217; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-family:var(--font); }
+    textarea { min-height:120px; resize:vertical; }
+    .status { margin-top:10px; }
+    .badges { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .badge { border:1px solid #225071; background:#10273a; color:#d7efff; border-radius:999px; padding:3px 10px; font-size:.8rem; }
+    footer { border-top:1px solid var(--border); padding:20px 0 30px; margin-top:30px; color:var(--muted); }
+    @media (max-width: 900px) { .grid { grid-template-columns:1fr; } }
+    @media (max-width: 720px) { .nav { flex-direction: column; align-items: flex-start; gap: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="nav-wrap">
+    <div class="container nav">
+      <a class="brand" href="https://www.sixsensesolutions.net/">Six Sense Solutions</a>
+      <div class="nav-links">
+        <a href="/api-reference/">API Reference</a>
+        <a href="/developer/">Developer Docs</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/contact/">Contact</a>
+        <a href="/trust/">Trust</a>
+        <a class="btn" href="/#signup">Get Free API Key</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Get in touch</h1>
+      <p>For enterprise and government inquiries, use the form below. For free tier API keys, go to the homepage and sign up directly.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Send us a message</h2>
+        <form id="contact-form" action="https://api.sixsensesolutions.net/v1/contact" method="POST">
+          <label for="name">Name</label>
+          <input id="name" name="name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required>
+
+          <label for="company">Company</label>
+          <input id="company" name="company" required>
+
+          <label for="role">Role</label>
+          <select id="role" name="role">
+            <option value="Developer">Developer</option>
+            <option value="VP Engineering">VP Engineering</option>
+            <option value="CTO">CTO</option>
+            <option value="CISO">CISO</option>
+            <option value="Security Engineer">Security Engineer</option>
+            <option value="Government Contracting Officer">Government Contracting Officer</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="subject">Subject</label>
+          <select id="subject" name="subject">
+            <option value="Enterprise Pricing">Enterprise Pricing</option>
+            <option value="Government Contract Inquiry">Government Contract Inquiry</option>
+            <option value="Technical Question">Technical Question</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+
+          <button class="btn" type="submit" id="submit-btn">Send Message</button>
+        </form>
+        <div id="ok-msg" class="status" style="color:var(--ok);display:none;">Thank you. We will respond within one business day.</div>
+        <div id="err-msg" class="status" style="color:var(--err);display:none;">Something went wrong. Please email us directly at hello@sixsensesolutions.net</div>
+      </article>
+
+      <article class="card">
+        <h2>Six Sense Solutions LLC</h2>
+        <p>Registered in Maryland, USA</p>
+        <p>SAM.gov registered vendor</p>
+        <p>NAICS: 541519, 541512, 541690</p>
+        <p>Email: <a href="mailto:hello@sixsensesolutions.net">hello@sixsensesolutions.net</a></p>
+        <h3 style="margin-top:16px;">For enterprise and government buyers</h3>
+        <p>Six Sense Solutions is pursuing government contracts and enterprise agreements. If you represent a government agency or enterprise organization with credential security requirements, we respond to all inquiries within one business day.</p>
+        <div class="badges">
+          <span class="badge">NIST 800-63B</span>
+          <span class="badge">SOC2 Aligned</span>
+          <span class="badge">SAM.gov Registered</span>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>Six Sense Solutions LLC</div>
+      <div>
+        <a href="/">Home</a> |
+        <a href="/api-reference/">API Reference</a> |
+        <a href="/developer/">Developer Docs</a> |
+        <a href="/contact/">Contact</a>
+      </div>
+      <div>Copyright 2026 Six Sense Solutions LLC. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const form = document.getElementById("contact-form");
+      const ok = document.getElementById("ok-msg");
+      const err = document.getElementById("err-msg");
+      const btn = document.getElementById("submit-btn");
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        ok.style.display = "none";
+        err.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Sending...";
+        try {
+          const payload = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            company: document.getElementById("company").value,
+            role: document.getElementById("role").value,
+            subject: document.getElementById("subject").value,
+            message: document.getElementById("message").value
+          };
+          const res = await fetch("https://api.sixsensesolutions.net/v1/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error("submit_failed");
+          ok.style.display = "block";
+          form.style.display = "none";
+        } catch (e2) {
+          err.style.display = "block";
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send Message";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

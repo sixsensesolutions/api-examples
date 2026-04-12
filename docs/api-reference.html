@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Six Sense API Reference</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #111418;
+      --panel-2: #151a20;
+      --text: #e7edf5;
+      --muted: #9aa8b9;
+      --accent: #2ca6ff;
+      --border: #25303d;
+      --ok: #2fd17b;
+      --font: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container {
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+    .nav-wrap { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); background: rgba(10,10,10,.92); border-bottom: 1px solid var(--border); }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { color: #ecf3fb; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .section { margin-top: 44px; }
+    h1, h2, h3 { line-height: 1.25; margin: 0 0 12px; }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+    h2 { font-size: clamp(1.2rem, 2.8vw, 1.7rem); }
+    p { margin: 0 0 12px; color: var(--muted); }
+    .hero {
+      background: linear-gradient(180deg, #0d1117 0%, #0a0a0a 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      color: #eaf6ff;
+      background: #12324a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .btn.secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .code {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      color: #d8e8ff;
+    }
+    .label {
+      display: inline-block;
+      color: #cfe8ff;
+      border: 1px solid #225071;
+      background: #10273a;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+    th { color: #d4e3f4; background: #0f1318; }
+    tr:last-child td { border-bottom: none; }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: #0f141a;
+      color: var(--text);
+      border-radius: 7px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.88rem;
+    }
+    .tab-btn.active {
+      border-color: #1f5f8c;
+      background: #13314a;
+      color: #dbf0ff;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .status-ok { color: var(--ok); }
+    footer {
+      margin-top: 46px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 980px) {
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .container { width: 94vw; }
+      .hero { padding: 18px; }
+      .grid-4 { grid-template-columns: 1fr; }
+      th, td { font-size: 0.84rem; padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-wrap">
+    <div class="container nav">
+      <a class="brand" href="https://www.sixsensesolutions.net/">Six Sense Solutions</a>
+      <div class="nav-links">
+        <a href="/api-reference/">API Reference</a>
+        <a href="/developer/">Developer Docs</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/contact/">Contact</a>
+        <a href="/trust/">Trust</a>
+        <a class="btn" href="/#signup">Get Free API Key</a>
+      </div>
+    </div>
+  </div>
+  <main class="container">
+    <section class="hero">
+      <h1>Security primitives API for developers</h1>
+      <p>Five endpoints: generate compliant credentials, validate strength and entropy, check breach exposure with k-anonymity, retrieve tamper-evident audit logs by date range (Pro tier and above), and issue free-tier API keys via signup. One integration, machine-readable documentation on every call.</p>
+      <div class="buttons">
+        <a class="btn" href="https://sixsensesolutions.net/contact">Get Your API Key</a>
+        <a class="btn secondary" href="https://github.com/">View on GitHub</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>The credential security problem developers inherit</h2>
+      <p>Developers reach for Math.random() or weak generation functions because the secure path requires too much internal work. Auditors then find the gap six months later. The Six Sense API puts cryptographic security and compliance documentation at the point where credentials are first created, not after the audit starts.</p>
+    </section>
+
+    <section class="section">
+      <h2>POST /v1/generate</h2>
+      <div class="grid-2">
+        <div class="card">
+          <p><strong>Base URL</strong></p>
+          <div class="code">https://api.sixsensesolutions.net</div>
+          <p style="margin-top:12px;"><strong>Authentication</strong></p>
+          <div class="code">Authorization: Bearer &lt;api_key&gt;</div>
+        </div>
+        <div class="card">
+          <p><strong>Endpoint</strong></p>
+          <div class="code">POST /v1/generate</div>
+          <p style="margin-top:12px;"><strong>Response</strong></p>
+          <div class="code status-ok">200 OK</div>
+        </div>
+      </div>
+      <p style="margin-top:14px;"><strong>Request example</strong></p>
+      <pre class="code">{
+  "length": 20,
+  "quantity": 5,
+  "options": {
+    "uppercase": true,
+    "lowercase": true,
+    "numbers": true,
+    "symbols": true,
+    "exclude_ambiguous": true
+  },
+  "compliance": "NIST"
+}</pre>
+      <p style="margin-top:14px;"><strong>Success response example</strong></p>
+      <pre class="code">{
+  "passwords": [
+    "xK9#mPqR2vHnYbL4wZ8j",
+    "Tn5@cFwM7pBsXqJ3eR6y",
+    "Hm2$kVzN8dGrPuL9wC4x"
+  ],
+  "meta": {
+    "length": 20,
+    "entropy_bits": 120,
+    "generated_at": "2026-04-09T15:18:11.094Z",
+    "compliance_profile": "NIST",
+    "calls_remaining": 49998
+  }
+}</pre>
+    </section>
+
+    <section class="section">
+      <h2>POST /v1/validate</h2>
+      <div class="grid-2">
+        <div class="card">
+          <p><strong>Base URL</strong></p>
+          <div class="code">https://api.sixsensesolutions.net</div>
+          <p style="margin-top:12px;"><strong>Authentication</strong></p>
+          <div class="code">Authorization: Bearer &lt;api_key&gt;</div>
+        </div>
+        <div class="card">
+          <p><strong>Endpoint</strong></p>
+          <div class="code">POST /v1/validate</div>
+          <p style="margin-top:12px;"><strong>Response</strong></p>
+          <div class="code status-ok">200 OK</div>
+          <p style="margin-top:10px;">A 200 response means validation ran successfully. Check the <code>passed</code> field for the credential result.</p>
+        </div>
+      </div>
+      <p style="margin-top:14px;"><strong>Request example</strong></p>
+      <pre class="code">{
+  "credential": "MyStr0ng!Pass#2026",
+  "policy": {
+    "compliance": "NIST"
+  }
+}</pre>
+      <p style="margin-top:14px;"><strong>Success response example</strong></p>
+      <pre class="code">{
+  "passed": true,
+  "score": 100,
+  "credential_analysis": {
+    "length": 18,
+    "entropy_bits": 118.3,
+    "has_uppercase": true,
+    "has_lowercase": true,
+    "has_numbers": true,
+    "has_symbols": true,
+    "has_ambiguous": true,
+    "charset_size": 95
+  },
+  "policy_results": {
+    "length": { "required": 15, "actual": 18, "passed": true },
+    "entropy_bits": { "required": 80, "actual": 118.3, "passed": true },
+    "uppercase": { "required": true, "actual": true, "passed": true },
+    "lowercase": { "required": true, "actual": true, "passed": true },
+    "numbers": { "required": true, "actual": true, "passed": true },
+    "symbols": { "required": true, "actual": true, "passed": true }
+  },
+  "compliance_profile": "NIST",
+  "failures": [],
+  "validated_at": "2026-04-11T20:17:51.859Z"
+}</pre>
+    </section>
+
+    <section class="section">
+      <h2>POST /v1/breach-check</h2>
+      <div class="grid-2">
+        <div class="card">
+          <p><strong>Base URL</strong></p>
+          <div class="code">https://api.sixsensesolutions.net</div>
+          <p style="margin-top:12px;"><strong>Authentication</strong></p>
+          <div class="code">Authorization: Bearer &lt;api_key&gt;</div>
+        </div>
+        <div class="card">
+          <p><strong>Endpoint</strong></p>
+          <div class="code">POST /v1/breach-check</div>
+          <p style="margin-top:12px;"><strong>Response</strong></p>
+          <div class="code status-ok">200 OK</div>
+        </div>
+      </div>
+      <p style="margin-top:14px;"><strong>Request example</strong></p>
+      <pre class="code">{
+  "credential": "the_credential_to_check"
+}</pre>
+      <p style="margin-top:14px;"><strong>Success response (not exposed)</strong></p>
+      <pre class="code">{
+  "exposed": false,
+  "exposure_count": 0,
+  "risk_rating": "low",
+  "checked_at": "2026-04-11T10:00:00.000Z",
+  "note": "This credential does not appear in known breach databases. This does not guarantee it is secure."
+}</pre>
+      <p style="margin-top:14px;"><strong>Success response (exposed)</strong></p>
+      <pre class="code">{
+  "exposed": true,
+  "exposure_count": 2254650,
+  "risk_rating": "critical",
+  "checked_at": "2026-04-11T20:17:54.352Z",
+  "note": "This credential appears in known breach databases. Do not use it."
+}</pre>
+      <p style="margin-top:12px;"><strong>K-anonymity</strong></p>
+      <p>The plaintext credential never leaves the caller's environment in a recoverable form: the API hashes the value and only transmits a short hash prefix to the external range service. Your credential is not stored by Six Sense Solutions.</p>
+    </section>
+
+    <section class="section">
+      <h2>GET /v1/audit-log</h2>
+      <div class="grid-2">
+        <div class="card">
+          <p><strong>Base URL</strong></p>
+          <div class="code">https://api.sixsensesolutions.net</div>
+          <p style="margin-top:12px;"><strong>Authentication</strong></p>
+          <div class="code">Authorization: Bearer &lt;api_key&gt;</div>
+          <p style="margin-top:12px;">Pro tier and above. Free tier keys receive <code>403 AUDIT_LOG_NOT_AVAILABLE</code>.</p>
+        </div>
+        <div class="card">
+          <p><strong>Endpoint</strong></p>
+          <div class="code">GET /v1/audit-log</div>
+          <p style="margin-top:12px;"><strong>Response</strong></p>
+          <div class="code status-ok">200 OK</div>
+        </div>
+      </div>
+      <p style="margin-top:14px;"><strong>Query parameters</strong></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>start_date</td><td>Yes</td><td>ISO calendar date, e.g. 2026-04-01 (UTC day boundary).</td></tr>
+          <tr><td>end_date</td><td>Yes</td><td>ISO calendar date, e.g. 2026-04-30. Must be on or after start_date.</td></tr>
+          <tr><td>event_type</td><td>No</td><td>Filter: <code>generate</code> or <code>validate</code>. Omit to return both.</td></tr>
+          <tr><td>limit</td><td>No</td><td>Max items to return, 1&ndash;1000. Default 100.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;">Maximum date span is 90 days. Events are ordered newest first.</p>
+      <p style="margin-top:14px;"><strong>Example request</strong></p>
+      <pre class="code">GET /v1/audit-log?start_date=2026-04-01&amp;end_date=2026-04-30&amp;event_type=generate&amp;limit=100</pre>
+      <p style="margin-top:14px;"><strong>Success response example</strong></p>
+      <pre class="code">{
+  "events": [
+    {
+      "event_id": "uuid",
+      "event_type": "generate",
+      "created_at": "2026-04-11T20:17:51Z",
+      "request": {
+        "length": 20,
+        "quantity": 1,
+        "compliance_profile": "NIST"
+      },
+      "result": {
+        "entropy_bits": 120.4,
+        "compliance_profile": "NIST",
+        "quantity_generated": 1
+      }
+    }
+  ],
+  "count": 1,
+  "start_date": "2026-04-01",
+  "end_date": "2026-04-30",
+  "api_key_id": "abcd1234"
+}</pre>
+      <p style="margin-top:14px;"><strong>Audit log errors</strong> are listed in the global error codes table: <code>MISSING_DATE_RANGE</code>, <code>INVALID_DATE_FORMAT</code>, <code>INVALID_DATE_RANGE</code>, and <code>AUDIT_LOG_NOT_AVAILABLE</code> (403, Pro tier required).</p>
+    </section>
+
+    <section class="section">
+      <h2>Compliance profiles</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Profile</th>
+            <th>Minimum Length</th>
+            <th>Character Requirements</th>
+            <th>Excludes Ambiguous</th>
+            <th>Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>NIST</td>
+            <td>15</td>
+            <td>Uppercase, lowercase, numbers, symbols</td>
+            <td>Yes</td>
+            <td>Regulated teams and audit-heavy environments</td>
+          </tr>
+          <tr>
+            <td>SOC2</td>
+            <td>12</td>
+            <td>Uppercase, lowercase, numbers</td>
+            <td>Yes</td>
+            <td>SaaS security controls and SOC2-aligned programs</td>
+          </tr>
+          <tr>
+            <td>strong</td>
+            <td>8</td>
+            <td>Caller-defined</td>
+            <td>Caller-defined</td>
+            <td>General product and internal credential workflows</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Error codes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>HTTP Status</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>INVALID_LENGTH</td><td>400</td><td>Length is outside allowed bounds.</td></tr>
+          <tr><td>INVALID_QUANTITY</td><td>400</td><td>Quantity is outside allowed bounds.</td></tr>
+          <tr><td>NO_CHARSET</td><td>400</td><td>No character set options were enabled.</td></tr>
+          <tr><td>INVALID_COMPLIANCE</td><td>400</td><td>Requested compliance profile is not recognized.</td></tr>
+          <tr><td>INVALID_BODY</td><td>400</td><td>Request body is missing or malformed.</td></tr>
+          <tr><td>INVALID_CREDENTIAL</td><td>400</td><td>Credential field is missing or not a string (validate and breach-check).</td></tr>
+          <tr><td>MISSING_DATE_RANGE</td><td>400</td><td><code>start_date</code> or <code>end_date</code> missing (audit-log).</td></tr>
+          <tr><td>INVALID_DATE_FORMAT</td><td>400</td><td>Invalid ISO date format (audit-log).</td></tr>
+          <tr><td>INVALID_DATE_RANGE</td><td>400</td><td>Invalid or too-wide date range (audit-log).</td></tr>
+          <tr><td>MISSING_AUTH</td><td>401</td><td>Authorization header is missing or malformed.</td></tr>
+          <tr><td>INVALID_KEY</td><td>401</td><td>API key is not valid.</td></tr>
+          <tr><td>AUDIT_LOG_NOT_AVAILABLE</td><td>403</td><td>Audit log access requires Pro tier or above.</td></tr>
+          <tr><td>SERVICE_UNAVAILABLE</td><td>503</td><td>Upstream breach database unreachable (breach-check).</td></tr>
+          <tr><td>RATE_LIMIT_EXCEEDED</td><td>429</td><td>Monthly usage limit for the key has been reached.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Pricing tiers</h2>
+      <div class="grid-4">
+        <article class="card">
+          <h3>Free</h3>
+          <p>500 calls/month</p>
+          <p>No credit card</p>
+        </article>
+        <article class="card">
+          <h3>Pro</h3>
+          <p>$29/month</p>
+          <p>50,000 calls/month</p>
+        </article>
+        <article class="card">
+          <h3>Business</h3>
+          <p>$149/month</p>
+          <p>500,000 calls/month</p>
+        </article>
+        <article class="card">
+          <h3>Enterprise</h3>
+          <p>Custom pricing</p>
+          <p>Unlimited calls, compliance documentation, priority support</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Code examples</h2>
+      <div class="tabs" role="tablist" aria-label="Code example language tabs">
+        <button class="tab-btn active" data-tab="js" role="tab" aria-selected="true">JavaScript</button>
+        <button class="tab-btn" data-tab="py" role="tab" aria-selected="false">Python</button>
+        <button class="tab-btn" data-tab="curl" role="tab" aria-selected="false">curl</button>
+      </div>
+      <div id="tab-js" class="tab-panel active" role="tabpanel">
+        <pre class="code">const response = await fetch("https://api.sixsensesolutions.net/v1/generate", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer test_pro_key"
+  },
+  body: JSON.stringify({
+    length: 20,
+    quantity: 1,
+    options: {
+      uppercase: true,
+      lowercase: true,
+      numbers: true,
+      symbols: true,
+      exclude_ambiguous: true
+    },
+    compliance: "NIST"
+  })
+});
+
+const json = await response.json();
+console.log(response.status, json.meta.entropy_bits);</pre>
+      </div>
+      <div id="tab-py" class="tab-panel" role="tabpanel">
+        <pre class="code">import requests
+
+url = "https://api.sixsensesolutions.net/v1/generate"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer test_pro_key"
+}
+payload = {
+    "length": 20,
+    "quantity": 1,
+    "options": {
+        "uppercase": True,
+        "lowercase": True,
+        "numbers": True,
+        "symbols": True,
+        "exclude_ambiguous": True
+    },
+    "compliance": "NIST"
+}
+
+r = requests.post(url, json=payload, headers=headers, timeout=15)
+print(r.status_code, r.json()["meta"]["calls_remaining"])</pre>
+      </div>
+      <div id="tab-curl" class="tab-panel" role="tabpanel">
+        <pre class="code">curl -X POST "https://api.sixsensesolutions.net/v1/generate" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test_pro_key" \
+  -d '{
+    "length": 20,
+    "quantity": 1,
+    "options": {
+      "uppercase": true,
+      "lowercase": true,
+      "numbers": true,
+      "symbols": true,
+      "exclude_ambiguous": true
+    },
+    "compliance": "NIST"
+  }'</pre>
+      </div>
+    </section>
+
+    <footer>
+      Built by Six Sense Solutions LLC<br>
+      <a href="https://sixsensesolutions.net/">Back to sixsensesolutions.net</a>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      const buttons = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          const key = button.getAttribute("data-tab");
+          buttons.forEach(function (b) {
+            b.classList.remove("active");
+            b.setAttribute("aria-selected", "false");
+          });
+          panels.forEach(function (p) { p.classList.remove("active"); });
+          button.classList.add("active");
+          button.setAttribute("aria-selected", "true");
+          const target = document.getElementById("tab-" + key);
+          if (target) target.classList.add("active");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

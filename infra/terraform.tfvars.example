@@ -1,0 +1,7 @@
+aws_region          = "us-east-1"
+environment         = "prod"
+project_name        = "six-sense-api"
+lambda_memory       = 256
+lambda_timeout      = 10
+log_retention_days  = 30
+dynamodb_table_name = "spg-api-keys"

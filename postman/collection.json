@@ -1,0 +1,519 @@
+{
+  "info": {
+    "name": "Six Sense Solutions API",
+    "_postman_id": "2d2f4bbf-ef57-4d58-b15a-e37407d95aa2",
+    "description": "Postman tests for the Six Sense Solutions password generation API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Test 1 - Happy path",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies successful generation with NIST profile and validates core response shape.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 5,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": true,\n    \"exclude_ambiguous\": true\n  },\n  \"compliance\": \"NIST\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('passwords length is 5', function () {",
+              "  pm.expect(json.passwords).to.be.an('array').with.lengthOf(5);",
+              "});",
+              "pm.test('every password length is 20', function () {",
+              "  json.passwords.forEach(function (p) { pm.expect(p.length).to.eql(20); });",
+              "});",
+              "pm.test('meta.entropy_bits is a number greater than 0', function () {",
+              "  pm.expect(json.meta.entropy_bits).to.be.a('number').and.to.be.above(0);",
+              "});",
+              "pm.test('meta.generated_at is valid ISO string', function () {",
+              "  const iso = new Date(json.meta.generated_at).toISOString();",
+              "  pm.expect(iso).to.eql(json.meta.generated_at);",
+              "});",
+              "pm.test('meta.calls_remaining is a number', function () {",
+              "  pm.expect(json.meta.calls_remaining).to.be.a('number');",
+              "});",
+              "pm.test('meta.compliance_profile is NIST', function () {",
+              "  pm.expect(json.meta.compliance_profile).to.eql('NIST');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 2 - No authorization header",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "Verifies unauthenticated requests are rejected with MISSING_AUTH.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": true,\n    \"exclude_ambiguous\": true\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is MISSING_AUTH', function () {",
+              "  pm.expect(json.error).to.eql('MISSING_AUTH');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 3 - Invalid API key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer invalid_key_xyz"
+          }
+        ],
+        "description": "Verifies invalid API key handling returns INVALID_KEY.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": false,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is INVALID_KEY', function () {",
+              "  pm.expect(json.error).to.eql('INVALID_KEY');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 4 - Length too short",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies invalid length below minimum returns INVALID_LENGTH.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 4,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": false,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is INVALID_LENGTH', function () {",
+              "  pm.expect(json.error).to.eql('INVALID_LENGTH');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 5 - Length too long",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies invalid length above maximum returns INVALID_LENGTH.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 200,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": false,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is INVALID_LENGTH', function () {",
+              "  pm.expect(json.error).to.eql('INVALID_LENGTH');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 6 - No charset selected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies requests with all charset options disabled return NO_CHARSET.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": false,\n    \"lowercase\": false,\n    \"numbers\": false,\n    \"symbols\": false,\n    \"exclude_ambiguous\": true\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is NO_CHARSET', function () {",
+              "  pm.expect(json.error).to.eql('NO_CHARSET');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 7 - Invalid compliance profile",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies unknown compliance profile returns INVALID_COMPLIANCE and valid_options list.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": true,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"UNKNOWN\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is INVALID_COMPLIANCE', function () {",
+              "  pm.expect(json.error).to.eql('INVALID_COMPLIANCE');",
+              "});",
+              "pm.test('valid_options exists and is array', function () {",
+              "  pm.expect(json.valid_options).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 8 - NIST minimum enforcement",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies NIST profile enforces minimum length 15 when a smaller length is requested.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 12,\n  \"quantity\": 2,\n  \"options\": {\n    \"uppercase\": false,\n    \"lowercase\": true,\n    \"numbers\": false,\n    \"symbols\": false,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"NIST\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('meta.length is 15', function () {",
+              "  pm.expect(json.meta.length).to.eql(15);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 9 - Rate limit hit (manual prerequisite)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer test_free_key"
+          }
+        ],
+        "description": "Manual verification test. Requires test_free_key to already have 500 calls logged. Verifies RATE_LIMIT_EXCEEDED and calls_remaining = 0.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": false,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 429', function () {",
+              "  pm.response.to.have.status(429);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('error is RATE_LIMIT_EXCEEDED', function () {",
+              "  pm.expect(json.error).to.eql('RATE_LIMIT_EXCEEDED');",
+              "});",
+              "pm.test('calls_remaining is 0', function () {",
+              "  const remaining = json.meta && typeof json.meta.calls_remaining !== 'undefined' ? json.meta.calls_remaining : json.calls_remaining;",
+              "  pm.expect(remaining).to.eql(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 10 - Entropy accuracy",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{api_key}}"
+          }
+        ],
+        "description": "Verifies entropy_bits is present and greater than zero with strong profile and full charset options.",
+        "url": {
+          "raw": "{{base_url}}/v1/generate",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "generate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"length\": 20,\n  \"quantity\": 1,\n  \"options\": {\n    \"uppercase\": true,\n    \"lowercase\": true,\n    \"numbers\": true,\n    \"symbols\": true,\n    \"exclude_ambiguous\": false\n  },\n  \"compliance\": \"strong\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('meta.entropy_bits is a number greater than 0', function () {",
+              "  pm.expect(json.meta.entropy_bits).to.be.a('number').and.to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://cx94ds4s0c.execute-api.us-east-1.amazonaws.com"
+    },
+    {
+      "key": "api_key",
+      "value": "test_pro_key"
+    }
+  ]
+}

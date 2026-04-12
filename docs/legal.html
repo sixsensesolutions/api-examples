@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legal | Six Sense Solutions</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0a0a0a; --panel:#111418; --text:#e7edf5; --muted:#9aa8b9; --accent:#2ca6ff; --border:#25303d; --font:"Fira Code", ui-monospace, monospace; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.65; }
+    .container { width:min(1000px, 92vw); margin:0 auto; }
+    .nav-wrap { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); background: rgba(10,10,10,.92); border-bottom: 1px solid var(--border); }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { color: #ecf3fb; font-weight: 600; }
+    .nav-links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .section { margin:22px 0; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:18px; }
+    h1,h2 { margin:0 0 10px; }
+    p { margin:0 0 10px; color:var(--muted); }
+    footer { border-top:1px solid var(--border); margin-top:28px; padding:18px 0 28px; color:var(--muted); }
+    .btn { display:inline-block; border:1px solid var(--accent); background:#12324a; color:#eaf6ff; border-radius:8px; padding:10px 14px; font-family:var(--font); }
+    @media (max-width: 720px) { .nav { flex-direction: column; align-items: flex-start; gap: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="nav-wrap">
+    <div class="container nav">
+      <a class="brand" href="https://www.sixsensesolutions.net/">Six Sense Solutions</a>
+      <div class="nav-links">
+        <a href="/api-reference/">API Reference</a>
+        <a href="/developer/">Developer Docs</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/contact/">Contact</a>
+        <a href="/trust/">Trust</a>
+        <a class="btn" href="/#signup">Get Free API Key</a>
+      </div>
+    </div>
+  </div>
+  <main class="container">
+    <h1 style="margin-top:20px;">Legal</h1>
+    <p>Effective date: April 2026</p>
+    <section class="section">
+      <h2>Privacy Policy</h2>
+      <p>Six Sense Solutions LLC collects limited account and contact data needed to operate the API service, including name, email, request metadata, and operational logs. We do not store generated passwords. We use collected data to provide service functionality, security monitoring, support, billing administration, and legal compliance.</p>
+      <p>By using our site or API, you consent to this data handling. We may update this policy from time to time. Continued use after updates constitutes acceptance of the revised policy.</p>
+    </section>
+    <section class="section">
+      <h2>Terms of Service</h2>
+      <p>The API is provided on an as-is and as-available basis without warranties of any kind, express or implied. You are responsible for your application security, key management, and compliance obligations in your environment. Abuse, unauthorized access, or unlawful use is prohibited.</p>
+      <p>Six Sense Solutions LLC may suspend or terminate access for violations, service protection, or legal requirements. Liability is limited to the maximum extent permitted by law. These terms are governed by applicable U.S. law.</p>
+    </section>
+  </main>
+  <footer>
+    <div class="container">
+      <div>Six Sense Solutions LLC</div>
+      <div><a href="/">Home</a> | <a href="/api-reference/">API Reference</a> | <a href="/developer/">Developer Docs</a> | <a href="/contact/">Contact</a></div>
+      <div>Copyright 2026 Six Sense Solutions LLC. All rights reserved.</div>
+    </div>
+  </footer>
+</body>
+</html>
