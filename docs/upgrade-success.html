@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://www.sixsensesolutions.net/upgrade-success/">
+  <title>Upgrade Complete | Six Sense Solutions</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #060b14; color: #e8eef9; }
+    .container { max-width: 760px; margin: 48px auto; padding: 24px; }
+    .card { background: #0f1726; border: 1px solid #1e2a42; border-radius: 14px; padding: 24px; }
+    h1 { margin: 0 0 12px; }
+    p { color: #b8c5dc; line-height: 1.5; }
+    .tier { color: #7ec4ff; font-weight: bold; }
+    .key-wrap { margin: 16px 0; }
+    pre { background: #071022; border: 1px solid #223357; padding: 12px; border-radius: 10px; overflow-x: auto; }
+    .btn { display: inline-block; background: #2f80ed; color: #fff; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; text-decoration: none; margin-right: 8px; }
+    .btn.secondary { background: #1d2b45; }
+    .note { font-size: 0.95rem; color: #ffd799; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Your upgrade is complete</h1>
+      <p>Your API key has been upgraded. You can start using your new limits immediately.</p>
+      <p>Tier: <span id="tier" class="tier">Unknown</span></p>
+      <div class="key-wrap">
+        <p>Your API key:</p>
+        <pre id="api-key"></pre>
+        <button id="copy-key" class="btn secondary" type="button">Copy API Key</button>
+      </div>
+      <p class="note">Your key is shown once. Save it now.</p>
+      <p>
+        <a class="btn" href="/api-reference/">API Reference</a>
+        <a class="btn secondary" href="/">Homepage</a>
+      </p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const tier = (params.get("tier") || "").toLowerCase();
+      const apiKey = params.get("api_key") || "";
+      const tierEl = document.getElementById("tier");
+      const keyEl = document.getElementById("api-key");
+      const copyBtn = document.getElementById("copy-key");
+
+      if (tier === "pro" || tier === "business") {
+        tierEl.textContent = tier;
+      } else {
+        tierEl.textContent = "upgraded";
+      }
+      keyEl.textContent = apiKey || "No API key was found in this link.";
+
+      copyBtn.addEventListener("click", async function () {
+        if (!apiKey) return;
+        try {
+          await navigator.clipboard.writeText(apiKey);
+          copyBtn.textContent = "Copied";
+          setTimeout(function () { copyBtn.textContent = "Copy API Key"; }, 1500);
+        } catch (error) {
+          copyBtn.textContent = "Copy Failed";
+          setTimeout(function () { copyBtn.textContent = "Copy API Key"; }, 1500);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

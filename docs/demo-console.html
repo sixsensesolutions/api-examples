@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Six Sense Solutions - Demo Console</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --card: #111827;
+      --border: #1e293b;
+      --accent: #57d7d0;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --ok: #22c55e;
+      --err: #ef4444;
+      --warn: #f59e0b;
+      --font: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      background: #0b1320;
+      padding: 16px 0 14px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 1.18rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .warning {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid #7a4f00;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.1);
+      color: #facc15;
+      font-size: 0.85rem;
+    }
+    .config {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select, button, textarea {
+      font-family: var(--font);
+      font-size: 0.86rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: #0a1220;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    main {
+      padding: 18px 0 28px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 14px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 6px 0 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .checks label { display: inline-flex; align-items: center; gap: 6px; }
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .range-value {
+      min-width: 36px;
+      text-align: center;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .btn {
+      background: #0f766e;
+      border: 1px solid #1d8f85;
+      color: #ecfeff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn.secondary {
+      background: #12253a;
+      border-color: #28435f;
+      color: #b9d4f1;
+      font-weight: 500;
+    }
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0d1626;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .muted { color: var(--muted); font-size: 0.82rem; }
+    .warning-text { color: var(--warn); font-size: 0.82rem; }
+    .status-big { font-size: 1.4rem; font-weight: 700; margin: 6px 0; }
+    .status-ok { color: var(--ok); }
+    .status-bad { color: var(--err); }
+    .pw-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      background: #0a1220;
+    }
+    .pw {
+      overflow-wrap: anywhere;
+      color: #d9f4ff;
+      font-size: 0.84rem;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0a1220;
+      padding: 8px;
+    }
+    .metric .label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+    .metric .value {
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .metric .value.teal {
+      color: var(--accent);
+      font-size: 1.12rem;
+    }
+    .req-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .error-box {
+      margin-top: 10px;
+      border: 1px solid #7f1d1d;
+      background: rgba(239, 68, 68, 0.12);
+      border-radius: 10px;
+      padding: 10px;
+      color: #fecaca;
+      display: none;
+    }
+    .error-box .code {
+      color: var(--err);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      padding: 8px 6px;
+      color: var(--text);
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .api-key-display {
+      font-size: 1rem;
+      color: #d8ecff;
+      background: #0a1220;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      overflow-wrap: anywhere;
+      margin-bottom: 8px;
+    }
+    .json-wrap {
+      margin-top: 10px;
+      background: #0a1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    pre {
+      margin: 0;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.82rem;
+    }
+    .json-k { color: var(--accent); }
+    .json-s { color: var(--ok); }
+    .json-n { color: var(--warn); }
+    .json-b { color: var(--err); }
+    .json-null { color: #9ca3af; }
+    .inspector-meta {
+      color: var(--muted);
+      font-size: 0.79rem;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .config { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title-wrap">
+        <h1>Six Sense Solutions</h1>
+        <p>Demo Console</p>
+      </div>
+      <div class="warning">Internal use only. Not linked from public site. For testing and demos only.</div>
+      <div class="config">
+        <div class="field">
+          <label for="api-key">API Key</label>
+          <input id="api-key" value="sss_free_ce49c84cb3129e276cb702aac2efd2ed">
+        </div>
+        <div class="field">
+          <label for="base-url">Base URL</label>
+          <input id="base-url" value="https://api.sixsensesolutions.net">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Section 1: Generate Credentials</h2>
+      <div class="row">
+        <div class="field col-4">
+          <label for="gen-compliance">Compliance profile</label>
+          <select id="gen-compliance">
+            <option>NIST</option>
+            <option selected>SOC2</option>
+            <option>HIPAA</option>
+            <option>STRONG</option>
+          </select>
+        </div>
+        <div class="field col-4">
+          <label for="gen-quantity">Quantity</label>
+          <input id="gen-quantity" type="number" min="1" max="10" value="3">
+        </div>
+        <div class="field col-4">
+          <label for="gen-length">Length</label>
+          <div class="range-wrap">
+            <input id="gen-length" type="range" min="8" max="128" value="20">
+            <span id="gen-length-val" class="range-value">20</span>
+          </div>
+        </div>
+      </div>
+      <div class="checks">
+        <label><input id="gen-upper" type="checkbox" checked> Uppercase</label>
+        <label><input id="gen-lower" type="checkbox" checked> Lowercase</label>
+        <label><input id="gen-numbers" type="checkbox" checked> Numbers</label>
+        <label><input id="gen-symbols" type="checkbox" checked> Symbols</label>
+        <label><input id="gen-ambig" type="checkbox" checked> Exclude Ambiguous</label>
+      </div>
+      <button id="btn-generate" class="btn"><span class="spinner"></span><span class="btn-text">Generate Credentials</span></button>
+      <div id="generate-result" class="panel"></div>
+      <div id="generate-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 2: Validate Credential</h2>
+      <div class="row">
+        <div class="field col-8">
+          <label for="val-credential">Enter credential to validate</label>
+          <input id="val-credential" placeholder="Enter credential">
+        </div>
+        <div class="field col-4">
+          <label for="val-compliance">Compliance</label>
+          <select id="val-compliance">
+            <option>NIST</option>
+            <option selected>SOC2</option>
+            <option>HIPAA</option>
+          </select>
+        </div>
+      </div>
+      <button id="btn-validate" class="btn"><span class="spinner"></span><span class="btn-text">Validate</span></button>
+      <div id="validate-result" class="panel"></div>
+      <div id="validate-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 3: Breach Check</h2>
+      <div class="row">
+        <div class="field col-12">
+          <label for="breach-credential">Enter credential to check</label>
+          <input id="breach-credential" placeholder="Enter credential">
+        </div>
+      </div>
+      <p class="muted">Uses k-anonymity. Only the first 5 characters of a hash are sent externally. Your credential is never transmitted.</p>
+      <button id="btn-breach" class="btn"><span class="spinner"></span><span class="btn-text">Check Breach Exposure</span></button>
+      <div id="breach-result" class="panel"></div>
+      <div id="breach-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 4: Audit Log</h2>
+      <p class="warning-text">Requires Pro tier or above. Free tier will return 403.</p>
+      <div class="row">
+        <div class="field col-4">
+          <label for="audit-start">Start date</label>
+          <input id="audit-start" type="date">
+        </div>
+        <div class="field col-4">
+          <label for="audit-end">End date</label>
+          <input id="audit-end" type="date">
+        </div>
+        <div class="field col-4">
+          <label for="audit-limit">Limit</label>
+          <select id="audit-limit">
+            <option>10</option>
+            <option selected>25</option>
+            <option>50</option>
+          </select>
+        </div>
+      </div>
+      <button id="btn-audit" class="btn"><span class="spinner"></span><span class="btn-text">Pull Audit Log</span></button>
+      <div id="audit-result" class="panel"></div>
+      <div id="audit-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 5: Credential Lifecycle Event</h2>
+      <p class="warning-text">Requires Pro tier or above.</p>
+      <p class="muted">Log what happens to a credential after it is generated. Accessed, rotated, revoked, expired, or shared.</p>
+      <div class="row">
+        <div class="field col-4">
+          <label for="lifecycle-event-type">Event Type</label>
+          <select id="lifecycle-event-type">
+            <option selected>accessed</option>
+            <option>rotated</option>
+            <option>revoked</option>
+            <option>expired</option>
+            <option>shared</option>
+          </select>
+        </div>
+        <div class="field col-4">
+          <label for="lifecycle-environment">Environment</label>
+          <input id="lifecycle-environment" value="production">
+        </div>
+        <div class="field col-4">
+          <label for="lifecycle-actor">Actor</label>
+          <input id="lifecycle-actor" value="user-provisioning-service">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field col-6">
+          <label for="lifecycle-credential-id">Credential ID (optional)</label>
+          <input id="lifecycle-credential-id" placeholder="optional-reference-id">
+        </div>
+        <div class="field col-6">
+          <label for="lifecycle-metadata">Metadata (optional)</label>
+          <textarea id="lifecycle-metadata" rows="3" placeholder='{"reason": "scheduled rotation"}'></textarea>
+        </div>
+      </div>
+      <button id="btn-lifecycle" class="btn"><span class="spinner"></span><span class="btn-text">Log Lifecycle Event</span></button>
+      <div id="lifecycle-result" class="panel"></div>
+      <div id="lifecycle-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 6: Generate Free API Key</h2>
+      <div class="row">
+        <div class="field col-6">
+          <label for="signup-name">Name</label>
+          <input id="signup-name" placeholder="Demo User">
+        </div>
+        <div class="field col-6">
+          <label for="signup-email">Email</label>
+          <input id="signup-email" type="email" placeholder="demo+test@example.com">
+        </div>
+      </div>
+      <p class="warning-text">This creates a real key in the database. Use test emails only during demos.</p>
+      <button id="btn-signup" class="btn"><span class="spinner"></span><span class="btn-text">Generate Free API Key</span></button>
+      <div id="signup-result" class="panel"></div>
+      <div id="signup-error" class="error-box"></div>
+    </section>
+
+    <section class="card">
+      <h2>Section 7: Raw Response Inspector</h2>
+      <div class="inspector-meta" id="inspector-meta">No calls made yet.</div>
+      <button id="btn-copy-json" class="btn secondary">Copy JSON</button>
+      <div class="json-wrap">
+        <pre id="inspector-json">{}</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      lastResponse: {},
+      lastStatus: "-",
+      lastMs: "-",
+      lastTimestamp: "-"
+    };
+
+    function getApiKey() {
+      return document.getElementById("api-key").value.trim();
+    }
+
+    function getBaseUrl() {
+      return document.getElementById("base-url").value.trim().replace(/\/+$/, "");
+    }
+
+    function setLoading(button, loading) {
+      const text = button.querySelector(".btn-text");
+      if (loading) {
+        button.disabled = true;
+        button.classList.add("loading");
+        text.dataset.prev = text.textContent;
+        text.textContent = "Loading...";
+      } else {
+        button.disabled = false;
+        button.classList.remove("loading");
+        text.textContent = text.dataset.prev || text.textContent;
+      }
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function syntaxHighlight(value) {
+      const json = JSON.stringify(value, null, 2);
+      return escapeHtml(json).replace(
+        /"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?=\s*:)?|-?\d+(\.\d+)?([eE][+\-]?\d+)?|\btrue\b|\bfalse\b|\bnull\b/g,
+        (match) => {
+          if (match.startsWith("\"") && match.endsWith(":")) return "<span class=\"json-k\">" + match + "</span>";
+          if (match.startsWith("\"")) return "<span class=\"json-s\">" + match + "</span>";
+          if (match === "true" || match === "false") return "<span class=\"json-b\">" + match + "</span>";
+          if (match === "null") return "<span class=\"json-null\">" + match + "</span>";
+          return "<span class=\"json-n\">" + match + "</span>";
+        }
+      );
+    }
+
+    function showError(targetId, err) {
+      const box = document.getElementById(targetId);
+      const code = err.code || "REQUEST_FAILED";
+      const status = err.status || "unknown";
+      const message = err.message || "Unexpected error";
+      box.style.display = "block";
+      box.innerHTML = [
+        "<div class=\"code\">" + escapeHtml(code) + "</div>",
+        "<div>Error message: " + escapeHtml(message) + "</div>",
+        "<div>HTTP status: " + escapeHtml(String(status)) + "</div>",
+        "<div>Suggestion: verify inputs, API key, and tier permissions.</div>"
+      ].join("");
+    }
+
+    function clearError(targetId) {
+      const box = document.getElementById(targetId);
+      box.style.display = "none";
+      box.innerHTML = "";
+    }
+
+    async function apiCall(endpoint, method, body, useAuth = true) {
+      const start = performance.now();
+      const headers = {};
+      if (body !== undefined && body !== null) headers["Content-Type"] = "application/json";
+      if (useAuth) headers["Authorization"] = "Bearer " + getApiKey();
+      const url = getBaseUrl() + endpoint;
+
+      let response;
+      let data = null;
+      try {
+        response = await fetch(url, {
+          method,
+          headers,
+          body: body !== undefined && body !== null ? JSON.stringify(body) : undefined
+        });
+      } catch (networkErr) {
+        const elapsed = Math.round(performance.now() - start);
+        updateInspector({
+          status: "NETWORK_ERROR",
+          elapsedMs: elapsed,
+          data: { error: "Network error", details: String(networkErr) }
+        });
+        throw { code: "NETWORK_ERROR", message: String(networkErr), status: "NETWORK_ERROR" };
+      }
+
+      const elapsed = Math.round(performance.now() - start);
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+
+      updateInspector({
+        status: response.status,
+        elapsedMs: elapsed,
+        data
+      });
+
+      if (!response.ok) {
+        throw {
+          code: data.code || "REQUEST_FAILED",
+          message: data.error || data.message || "Request failed",
+          status: response.status,
+          raw: data
+        };
+      }
+
+      return { status: response.status, data, elapsedMs: elapsed };
+    }
+
+    function updateInspector({ status, elapsedMs, data }) {
+      state.lastResponse = data;
+      state.lastStatus = status;
+      state.lastMs = elapsedMs;
+      state.lastTimestamp = new Date().toLocaleString();
+      document.getElementById("inspector-meta").textContent =
+        "Timestamp: " + state.lastTimestamp + " | HTTP Status: " + state.lastStatus + " | Response Time: " + state.lastMs + "ms";
+      document.getElementById("inspector-json").innerHTML = syntaxHighlight(data || {});
+    }
+
+    function toReadableDate(input) {
+      if (!input) return "-";
+      const d = new Date(input);
+      if (Number.isNaN(d.getTime())) return String(input);
+      return d.toLocaleString();
+    }
+
+    function renderGenerate(result) {
+      const target = document.getElementById("generate-result");
+      const passwords = Array.isArray(result.passwords) ? result.passwords : [];
+      const meta = result.meta || {};
+      const rows = passwords.map((pw, idx) => (
+        "<div class=\"pw-row\"><div class=\"pw\">" + escapeHtml(pw) + "</div>" +
+        "<button class=\"btn secondary\" type=\"button\" onclick=\"copyText(this, '" + encodeURIComponent(pw) + "')\">Copy</button></div>"
+      )).join("");
+      target.innerHTML =
+        "<div>" + (rows || "<p class='muted'>No passwords returned.</p>") + "</div>" +
+        "<div class=\"metric-grid\">" +
+        "<div class=\"metric\"><div class=\"label\">Entropy Bits - Mathematical proof of strength</div><div class=\"value teal\">" + escapeHtml(meta.entropy_bits ?? "-") + "</div></div>" +
+        "<div class=\"metric\"><div class=\"label\">Compliance Profile</div><div class=\"value\">" + escapeHtml(meta.compliance_profile ?? "-") + "</div></div>" +
+        "<div class=\"metric\"><div class=\"label\">Generated At</div><div class=\"value\">" + escapeHtml(toReadableDate(meta.generated_at)) + "</div></div>" +
+        "<div class=\"metric\"><div class=\"label\">Calls Remaining</div><div class=\"value\">" + escapeHtml(meta.calls_remaining ?? "-") + "</div></div>" +
+        "</div>";
+    }
+
+    function renderValidate(result) {
+      const target = document.getElementById("validate-result");
+      const passed = !!(result.passed || result.valid || result.is_valid);
+      const score = result.score ?? result.strength_score ?? "-";
+      const checks = result.policy_results || result.requirements || {};
+      const failures = result.failures || [];
+      const items = Object.keys(checks).map((key) => {
+        const item = checks[key] || {};
+        const ok = item.passed !== false;
+        return "<li>" + (ok ? "✅ " : "❌ ") + escapeHtml(key) + "</li>";
+      }).join("");
+      const failText = failures.length
+        ? "<div class='warning-text'>Failures: " + escapeHtml(failures.join(", ")) + "</div>"
+        : "";
+      target.innerHTML =
+        "<div class='status-big " + (passed ? "status-ok" : "status-bad") + "'>" + (passed ? "PASS" : "FAIL") + "</div>" +
+        "<div>Score: <strong>" + escapeHtml(String(score)) + "%</strong></div>" +
+        "<ul class='req-list'>" + (items || "<li>No requirement details returned.</li>") + "</ul>" +
+        failText;
+    }
+
+    function renderBreach(result) {
+      const target = document.getElementById("breach-result");
+      const exposed = !!result.exposed;
+      const count = result.exposure_count ?? 0;
+      if (exposed) {
+        target.innerHTML =
+          "<div class='status-big status-bad'>EXPOSED</div>" +
+          "<div class='status-bad'>Found in " + Number(count).toLocaleString() + " breach records</div>" +
+          "<div class='warning-text'>Recommendation: rotate immediately and block reuse.</div>";
+      } else {
+        target.innerHTML =
+          "<div class='status-big status-ok'>NOT EXPOSED</div>" +
+          "<div class='status-ok'>This credential has not appeared in known data breaches.</div>";
+      }
+    }
+
+    function renderAudit(result) {
+      const target = document.getElementById("audit-result");
+      const events = result.events || result.items || [];
+      if (!events.length) {
+        target.innerHTML = "<p class='muted'>No audit events returned.</p>";
+        return;
+      }
+      const rows = events.map((event) => {
+        const req = event.request || {};
+        const res = event.result || {};
+        const status = event.status || event.event_type || "ok";
+        return "<tr>" +
+          "<td>" + escapeHtml(toReadableDate(event.created_at || event.timestamp)) + "</td>" +
+          "<td>" + escapeHtml(event.event_type || event.action || "-") + "</td>" +
+          "<td>" + escapeHtml(req.compliance_profile || res.compliance_profile || event.compliance || "-") + "</td>" +
+          "<td>" + escapeHtml(res.entropy_bits ?? event.entropy_bits ?? "-") + "</td>" +
+          "<td>" + escapeHtml(status) + "</td>" +
+          "</tr>";
+      }).join("");
+      target.innerHTML = "<table><thead><tr><th>Timestamp</th><th>Action</th><th>Compliance Profile</th><th>Entropy Bits</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    }
+
+    function renderSignup(result) {
+      const target = document.getElementById("signup-result");
+      const key = result.api_key || result.key || "";
+      target.innerHTML =
+        "<div class='api-key-display'>" + escapeHtml(key || "No key returned") + "</div>" +
+        "<button class='btn secondary' type='button' onclick=\"copyText(this, '" + encodeURIComponent(key) + "')\">Copy</button>" +
+        "<p class='warning-text'>This key is shown once. Save it now.</p>" +
+        "<div class='metric-grid'>" +
+        "<div class='metric'><div class='label'>calls_remaining</div><div class='value'>" + escapeHtml(result.calls_remaining ?? "-") + "</div></div>" +
+        "<div class='metric'><div class='label'>tier</div><div class='value'>" + escapeHtml((result.tier || "FREE").toUpperCase()) + "</div></div>" +
+        "</div>";
+    }
+
+    function renderLifecycle(result) {
+      const target = document.getElementById("lifecycle-result");
+      target.innerHTML =
+        "<div class='metric-grid'>" +
+        "<div class='metric'><div class='label'>event_id</div><div class='value'>" + escapeHtml(result.event_id ?? "-") + "</div></div>" +
+        "<div class='metric'><div class='label'>event_type</div><div class='value'>" + escapeHtml(result.event_type ?? "-") + "</div></div>" +
+        "<div class='metric'><div class='label'>recorded_at</div><div class='value'>" + escapeHtml(toReadableDate(result.recorded_at)) + "</div></div>" +
+        "</div>" +
+        "<div class='status-big status-ok'>status: " + escapeHtml(result.status ?? "recorded") + "</div>";
+    }
+
+    function copyText(btn, encoded) {
+      const textToCopy = decodeURIComponent(encoded || "");
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btn.textContent = "Copied";
+        btn.style.background = "#22c55e";
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.style.background = "#57d7d0";
+        }, 2000);
+      });
+    }
+    window.copyText = copyText;
+
+    document.getElementById("gen-length").addEventListener("input", (e) => {
+      document.getElementById("gen-length-val").textContent = e.target.value;
+    });
+
+    document.getElementById("btn-generate").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("generate-error");
+      setLoading(btn, true);
+      try {
+        const body = {
+          length: Number(document.getElementById("gen-length").value),
+          quantity: Number(document.getElementById("gen-quantity").value),
+          compliance: document.getElementById("gen-compliance").value,
+          options: {
+            uppercase: document.getElementById("gen-upper").checked,
+            lowercase: document.getElementById("gen-lower").checked,
+            numbers: document.getElementById("gen-numbers").checked,
+            symbols: document.getElementById("gen-symbols").checked,
+            exclude_ambiguous: document.getElementById("gen-ambig").checked
+          }
+        };
+        const res = await apiCall("/v1/generate", "POST", body, true);
+        renderGenerate(res.data);
+      } catch (err) {
+        showError("generate-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-validate").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("validate-error");
+      setLoading(btn, true);
+      try {
+        const body = {
+          credential: document.getElementById("val-credential").value,
+          compliance: document.getElementById("val-compliance").value
+        };
+        const res = await apiCall("/v1/validate", "POST", body, true);
+        renderValidate(res.data);
+      } catch (err) {
+        showError("validate-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-breach").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("breach-error");
+      setLoading(btn, true);
+      try {
+        const body = { credential: document.getElementById("breach-credential").value };
+        const res = await apiCall("/v1/breach-check", "POST", body, true);
+        renderBreach(res.data);
+      } catch (err) {
+        showError("breach-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-audit").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("audit-error");
+      setLoading(btn, true);
+      try {
+        const startDateInput = document.getElementById("audit-start");
+        const endDateInput = document.getElementById("audit-end");
+        const startFormatted = startDateInput.value;
+        const endFormatted = endDateInput.value;
+        const limit = document.getElementById("audit-limit").value;
+        const endpoint = "/v1/audit-log?start_date=" + encodeURIComponent(startFormatted) + "&end_date=" + encodeURIComponent(endFormatted) + "&limit=" + encodeURIComponent(limit);
+        const res = await apiCall(endpoint, "GET", null, true);
+        renderAudit(res.data);
+      } catch (err) {
+        if (err.status === 403) {
+          document.getElementById("audit-result").innerHTML = "<div class='warning-text'>Audit log requires Pro tier. Upgrade at sixsensesolutions.net</div>";
+        }
+        showError("audit-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-signup").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("signup-error");
+      setLoading(btn, true);
+      try {
+        const body = {
+          name: document.getElementById("signup-name").value,
+          email: document.getElementById("signup-email").value
+        };
+        const res = await apiCall("/v1/signup", "POST", body, false);
+        renderSignup(res.data);
+      } catch (err) {
+        showError("signup-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-lifecycle").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      clearError("lifecycle-error");
+      setLoading(btn, true);
+      try {
+        const body = {
+          event_type: document.getElementById("lifecycle-event-type").value,
+          environment: document.getElementById("lifecycle-environment").value,
+          actor: document.getElementById("lifecycle-actor").value
+        };
+        const credentialId = document.getElementById("lifecycle-credential-id").value.trim();
+        const metadataText = document.getElementById("lifecycle-metadata").value.trim();
+        if (credentialId) {
+          body.credential_id = credentialId;
+        }
+        if (metadataText) {
+          body.metadata = JSON.parse(metadataText);
+        }
+        const res = await apiCall("/v1/credential/event", "POST", body, true);
+        renderLifecycle(res.data);
+      } catch (err) {
+        showError("lifecycle-error", err);
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    document.getElementById("btn-copy-json").addEventListener("click", (e) => {
+      const btn = e.currentTarget;
+      const textToCopy = JSON.stringify(state.lastResponse || {}, null, 2);
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btn.textContent = "Copied";
+        btn.style.background = "#22c55e";
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.style.background = "#57d7d0";
+        }, 2000);
+      });
+    });
+
+    (function initDates() {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 7);
+      const fmt = (d) => d.toISOString().split("T")[0];
+      document.getElementById("audit-start").value = fmt(start);
+      document.getElementById("audit-end").value = fmt(end);
+      document.getElementById("generate-result").innerHTML = "<p class='muted'>Run a generate request to see passwords and entropy metrics.</p>";
+      document.getElementById("validate-result").innerHTML = "<p class='muted'>Validate results will appear here.</p>";
+      document.getElementById("breach-result").innerHTML = "<p class='muted'>Breach check results will appear here.</p>";
+      document.getElementById("audit-result").innerHTML = "<p class='muted'>Audit log table will appear here.</p>";
+      document.getElementById("lifecycle-result").innerHTML = "<p class='muted'>Lifecycle event response will appear here.</p>";
+      document.getElementById("signup-result").innerHTML = "<p class='muted'>Generated free API key details will appear here.</p>";
+    })();
+  </script>
+</body>
+</html>

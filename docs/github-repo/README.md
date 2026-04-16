@@ -81,7 +81,7 @@ console.log(breach.exposed, breach.exposure_count, breach.risk_rating);
 
 ## Get a free API key
 
-500 calls per month. No credit card. Instant key generation.
+300 calls per month. No credit card. Instant key generation.
 
 [Get your free API key at sixsensesolutions.net](https://sixsensesolutions.net)
 

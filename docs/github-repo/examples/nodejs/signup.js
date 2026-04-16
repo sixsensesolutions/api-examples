@@ -1,6 +1,6 @@
 /**
  * Sign up for a free Six Sense Solutions API key
- * 500 calls per month, no credit card required
+ * 300 calls per month, no credit card required
  */
 
 async function signup(name, email) {
