@@ -1,0 +1,10 @@
+{
+  "name": "six-sense-example",
+  "version": "1.0.0",
+  "description": "Six Sense Solutions API integration example",
+  "main": "six-sense-credentials.js",
+  "scripts": {
+    "demo": "node demo.js"
+  },
+  "license": "MIT"
+}
